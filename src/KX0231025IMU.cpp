@@ -78,7 +78,7 @@ KX0231025Class::~KX0231025Class()
 
 int KX0231025Class::begin(int powerMode, int accelerationRange, int outputDataRate)
 {
-	this->accelerationRange = accelerationRange;
+	this->_accelerationRange = accelerationRange;
 
 	if (_spi != NULL) {
 		pinMode(_csPin, OUTPUT);
@@ -142,19 +142,19 @@ int KX0231025Class::readAcceleration(float& x, float& y, float& z)
 
 		return 0;
 	}
-	if (this->accelerationRange == KX0231025_RANGE_2G)
+	if (this->_accelerationRange == KX0231025_RANGE_2G)
 	{
 		x = data[0] * 2.0 / 32768.0;
 		y = data[1] * 2.0 / 32768.0;
 		z = data[2] * 2.0 / 32768.0;
 	}
-	if (this->accelerationRange == KX0231025_RANGE_4G)
+	if (this->_accelerationRange == KX0231025_RANGE_4G)
 	{
 		x = data[0] * 4.0 / 32768.0;
 		y = data[1] * 4.0 / 32768.0;
 		z = data[2] * 4.0 / 32768.0;
 	}
-	if (this->accelerationRange == KX0231025_RANGE_8G)
+	if (this->_accelerationRange == KX0231025_RANGE_8G)
 	{
 		x = data[0] * 8.0 / 32768.0;
 		y = data[1] * 8.0 / 32768.0;
