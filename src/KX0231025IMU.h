@@ -44,7 +44,7 @@ private:
 	SPIClass* _spi;
 	uint8_t _slaveAddress;
 	int _csPin;
-	int accelerationRange;
+	int _accelerationRange;
 
 	SPISettings _spiSettings;
 };
