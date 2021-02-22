@@ -28,19 +28,16 @@ public:
 	KX0231025Class(SPIClass& spi, int csPin);
 	virtual ~KX0231025Class();
 
-	int begin(int powerMode = 1, int accelerationRange = 0, int outputDataRate = 2); // mode 0= +/-2g, 1= +/-4g, 2= +/-8g
+	int begin(int powerMode = 1, int accelerationRange = 0, int outputDataRate = 2); //powerMode 0 = LowPower, 1 = HighPower; accelerationRange 0 = +/-2g, 1 = +/-4g, 2 = +/-8g; outputDataRate = 0(12.5Hz),1(25Hz),2(50Hz),3(100Hz),4(200Hz),5(400Hz),6(800Hz),7(1600Hz),8(0.781Hz),9(1.563Hz),10(3.125Hz),11(6.25Hz)
 	void end();
 
 	// Accelerometer
 	virtual int readAcceleration(float& x, float& y, float& z); // Results are in G (earth gravity).
-	virtual float accelerationSampleRate(); // Sampling rate of the sensor.
-	virtual int accelerationAvailable(); // Check for available data from accerometer
 
 private:
 	int readRegister(uint8_t address);
 	int readRegisters(uint8_t address, uint8_t* data, size_t length);
 	int writeRegister(uint8_t address, uint8_t value);
-
 
 private:
 	TwoWire* _wire;

@@ -165,20 +165,6 @@ int KX0231025Class::readAcceleration(float& x, float& y, float& z)
 	return 1;
 }
 
-int KX0231025Class::accelerationAvailable()
-{
-	if (readRegister(KX0231025_STATUS_REG) & 0x01) {
-		return 1;
-	}
-
-	return 0;
-}
-
-float KX0231025Class::accelerationSampleRate()
-{
-	return 50.0F;
-}
-
 int KX0231025Class::readRegister(uint8_t address)
 {
 	uint8_t value;
