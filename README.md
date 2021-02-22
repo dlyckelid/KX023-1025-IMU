@@ -13,7 +13,7 @@ KX0231025Class(SPIClass& spi, int csPin);
 ```
 KX0231025Class(TwoWire& wire, uint8_t slaveAddress);
 ```
-I2C has not been verified and tested as of yet. Refer to documentation for the save address
+I2C has not been verified and tested as of yet. Refer to documentation for the correct slave address
 
 # Functions
 
