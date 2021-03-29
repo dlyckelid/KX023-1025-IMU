@@ -104,11 +104,11 @@ int KX0231025Class::begin(int powerMode, int accelerationRange, int outputDataRa
 
 	int activateValue = 0x80 | powerMode;
 
-	if (this->accelerationRange == KX0231025_RANGE_4G)
+	if (this->_accelerationRange == KX0231025_RANGE_4G)
 	{
 		activateValue = activateValue | 0x08;
 	}
-	if (this->accelerationRange == KX0231025_RANGE_8G)
+	if (this->_accelerationRange == KX0231025_RANGE_8G)
 	{
 		activateValue = activateValue | 0x10;
 	}
