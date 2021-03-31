@@ -94,7 +94,7 @@ int KX0231025Class::begin(int powerMode, int accelerationRange, int outputDataRa
 		return 0;
 	}
 
-	if (powerMode == 0 && (outputDataRate == KX0231025_DATARATE_400HZ || outputDataRate == KX0231025_DATARATE_400HZ || outputDataRate == KX0231025_DATARATE_400HZ))
+	if (powerMode == 0 && (outputDataRate == KX0231025_DATARATE_400HZ || outputDataRate == KX0231025_DATARATE_800HZ || outputDataRate == KX0231025_DATARATE_1600HZ))
 	{
 		//Data rate not supported in low power mode
 		return 0;
