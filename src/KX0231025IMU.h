@@ -25,6 +25,7 @@
 class KX0231025Class {
 public:
 	KX0231025Class(TwoWire& wire, uint8_t slaveAddress);
+	KX0231025Class(TwoWire& wire, uint8_t slaveAddress, int sda, int scl);
 	KX0231025Class(SPIClass& spi, int csPin);
 	virtual ~KX0231025Class();
 
@@ -33,7 +34,8 @@ public:
 
 	// Accelerometer
 	virtual int readAcceleration(float& x, float& y, float& z); // Results are in G (earth gravity).
-
+	int getSda();
+	int getScl();
 private:
 	int readRegister(uint8_t address);
 	int readRegisters(uint8_t address, uint8_t* data, size_t length);
@@ -45,6 +47,8 @@ private:
 	uint8_t _slaveAddress;
 	int _csPin;
 	int _accelerationRange;
+	int _sda;
+	int _scl;
 
 	SPISettings _spiSettings;
 };
