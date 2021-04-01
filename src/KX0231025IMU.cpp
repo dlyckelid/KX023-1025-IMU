@@ -90,7 +90,7 @@ int KX0231025Class::begin(int powerMode, int accelerationRange, int outputDataRa
 		digitalWrite(_csPin, HIGH);
 		_spi->begin();
 	}
-	else if (_sda == 0)
+	else if (_sda != 0)
 	{
 		_wire->begin(_sda, _scl);
 	}
