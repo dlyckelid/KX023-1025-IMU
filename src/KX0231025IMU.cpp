@@ -19,82 +19,93 @@
 
 #include "KX0231025IMU.h"
 
-#define KX0231025_ADDRESS            0x18
+#define KX0231025_ADDRESS 0x18
 
-#define KX0231025_WHO_AM_I_REG       0X0F
-#define KX0231025_CTRL1				 0X18
-#define KX0231025_CTRL2				 0X19
-#define KX0231025_CTRL3				 0X20
-#define KX0231025_ODCNTL			 0X1B
+#define KX0231025_WHO_AM_I_REG 0X0F
+#define KX0231025_CTRL1 0X18
+#define KX0231025_CTRL2 0X19
+#define KX0231025_CTRL3 0X20
+#define KX0231025_ODCNTL 0X1B
 
-#define KX0231025_STATUS_REG         0X15
+#define KX0231025_STATUS_REG 0X15
 
-#define KX0231025_OUTX_L_XL          0X06
-#define KX0231025_OUTX_H_XL          0X07
-#define KX0231025_OUTY_L_XL          0X08
-#define KX0231025_OUTY_H_XL          0X09
-#define KX0231025_OUTZ_L_XL          0X10
-#define KX0231025_OUTZ_H_XL          0X11
+#define KX0231025_OUTX_L_XL 0X06
+#define KX0231025_OUTX_H_XL 0X07
+#define KX0231025_OUTY_L_XL 0X08
+#define KX0231025_OUTY_H_XL 0X09
+#define KX0231025_OUTZ_L_XL 0X10
+#define KX0231025_OUTZ_H_XL 0X11
 
-#define KX0231025_RANGE_2G			 0
-#define KX0231025_RANGE_4G			 1
-#define KX0231025_RANGE_8G			 2
+#define KX0231025_RANGE_2G 0
+#define KX0231025_RANGE_4G 1
+#define KX0231025_RANGE_8G 2
 
-#define KX0231025_DATARATE_12_5HZ	 0
-#define KX0231025_DATARATE_25HZ		 1
-#define KX0231025_DATARATE_50HZ		 2
-#define KX0231025_DATARATE_100HZ	 3
-#define KX0231025_DATARATE_200HZ	 4
-#define KX0231025_DATARATE_400HZ	 5
-#define KX0231025_DATARATE_800HZ	 6
-#define KX0231025_DATARATE_1600HZ	 7
-#define KX0231025_DATARATE_0_781HZ	 8
-#define KX0231025_DATARATE_1_563HZ	 9
-#define KX0231025_DATARATE_3_125HZ	 10
-#define KX0231025_DATARATE_6_25HZ	 11
+#define KX0231025_DATARATE_12_5HZ 0
+#define KX0231025_DATARATE_25HZ 1
+#define KX0231025_DATARATE_50HZ 2
+#define KX0231025_DATARATE_100HZ 3
+#define KX0231025_DATARATE_200HZ 4
+#define KX0231025_DATARATE_400HZ 5
+#define KX0231025_DATARATE_800HZ 6
+#define KX0231025_DATARATE_1600HZ 7
+#define KX0231025_DATARATE_0_781HZ 8
+#define KX0231025_DATARATE_1_563HZ 9
+#define KX0231025_DATARATE_3_125HZ 10
+#define KX0231025_DATARATE_6_25HZ 11
 
-#define KX0231025_LOWPOWER_MODE		 0X00
-#define KX0231025_HIGHPOWER_MODE	 0X40
+#define KX0231025_LOWPOWER_MODE 0X00
+#define KX0231025_HIGHPOWER_MODE 0X40
 
-
-KX0231025Class::KX0231025Class(TwoWire& wire, uint8_t slaveAddress) :
-	_wire(&wire),
-	_spi(NULL),
-	_slaveAddress(slaveAddress)
+KX0231025Class::KX0231025Class(TwoWire &wire, uint8_t slaveAddress) : _wire(&wire),
+																	  _spi(NULL),
+																	  _slaveAddress(slaveAddress),
+																	  _sda(0),
+																	  _scl(0)
 {
 }
-
-KX0231025Class::KX0231025Class(SPIClass& spi, int csPin) :
-	_wire(NULL),
-	_spi(&spi),
-	_csPin(csPin),
-	_spiSettings(10E6, MSBFIRST, SPI_MODE0)
+KX0231025Class::KX0231025Class(TwoWire &wire, uint8_t slaveAddress, int sda, int scl) : _wire(&wire),
+																						_spi(NULL),
+																						_slaveAddress(slaveAddress),
+																						_sda(sda),
+																						_scl(scl)
+{
+}
+KX0231025Class::KX0231025Class(SPIClass &spi, int csPin) : _wire(NULL),
+														   _spi(&spi),
+														   _csPin(csPin),
+														   _spiSettings(10E6, MSBFIRST, SPI_MODE0)
 {
 }
 
 KX0231025Class::~KX0231025Class()
 {
 }
-
 int KX0231025Class::begin(int powerMode, int accelerationRange, int outputDataRate)
 {
 	this->_accelerationRange = accelerationRange;
 
-	if (_spi != NULL) {
+	if (_spi != NULL)
+	{
 		pinMode(_csPin, OUTPUT);
 		digitalWrite(_csPin, HIGH);
 		_spi->begin();
 	}
-	else {
+	else if (_sda == 0)
+	{
+		_wire->begin(_sda, _scl);
+	}
+	else
+	{
 		_wire->begin();
 	}
 
-	if (readRegister(KX0231025_WHO_AM_I_REG) != 0x15) {
+	if (readRegister(KX0231025_WHO_AM_I_REG) != 0x15)
+	{
 		end();
 		return 0;
 	}
 
-	if (powerMode == 0 && (outputDataRate == KX0231025_DATARATE_400HZ || outputDataRate == KX0231025_DATARATE_800HZ || outputDataRate == KX0231025_DATARATE_1600HZ))
+	if (powerMode == 0 && (outputDataRate == KX0231025_DATARATE_400HZ || outputDataRate == KX0231025_DATARATE_400HZ || outputDataRate == KX0231025_DATARATE_400HZ))
 	{
 		//Data rate not supported in low power mode
 		return 0;
@@ -112,7 +123,7 @@ int KX0231025Class::begin(int powerMode, int accelerationRange, int outputDataRa
 	{
 		activateValue = activateValue | 0x10;
 	}
-		
+
 	writeRegister(KX0231025_CTRL1, activateValue);
 
 	return 1;
@@ -120,22 +131,30 @@ int KX0231025Class::begin(int powerMode, int accelerationRange, int outputDataRa
 
 void KX0231025Class::end()
 {
-	if (_spi != NULL) {
+	if (_spi != NULL)
+	{
 		_spi->end();
 		digitalWrite(_csPin, LOW);
 		pinMode(_csPin, INPUT);
 	}
-	else {
+	else
+	{
 		writeRegister(KX0231025_CTRL1, 0x18);
 		_wire->endTransmission();
 	}
 }
-
-int KX0231025Class::readAcceleration(float& x, float& y, float& z)
+int KX0231025Class::getSda(){
+	return _sda;
+}
+int KX0231025Class::getScl(){
+	return _scl;
+}
+int KX0231025Class::readAcceleration(float &x, float &y, float &z)
 {
 	int16_t data[3];
 
-	if (!readRegisters(KX0231025_OUTX_L_XL, (uint8_t*)data, sizeof(data))) {
+	if (!readRegisters(KX0231025_OUTX_L_XL, (uint8_t *)data, sizeof(data)))
+	{
 		x = NAN;
 		y = NAN;
 		z = NAN;
@@ -160,7 +179,6 @@ int KX0231025Class::readAcceleration(float& x, float& y, float& z)
 		y = data[1] * 8.0 / 32768.0;
 		z = data[2] * 8.0 / 32768.0;
 	}
-	
 
 	return 1;
 }
@@ -169,16 +187,18 @@ int KX0231025Class::readRegister(uint8_t address)
 {
 	uint8_t value;
 
-	if (readRegisters(address, &value, sizeof(value)) != 1) {
+	if (readRegisters(address, &value, sizeof(value)) != 1)
+	{
 		return -1;
 	}
 
 	return value;
 }
 
-int KX0231025Class::readRegisters(uint8_t address, uint8_t* data, size_t length)
+int KX0231025Class::readRegisters(uint8_t address, uint8_t *data, size_t length)
 {
-	if (_spi != NULL) {
+	if (_spi != NULL)
+	{
 		_spi->beginTransaction(_spiSettings);
 		digitalWrite(_csPin, LOW);
 		_spi->transfer(0x80 | address);
@@ -186,19 +206,23 @@ int KX0231025Class::readRegisters(uint8_t address, uint8_t* data, size_t length)
 		digitalWrite(_csPin, HIGH);
 		_spi->endTransaction();
 	}
-	else {
+	else
+	{
 		_wire->beginTransmission(_slaveAddress);
 		_wire->write(address);
 
-		if (_wire->endTransmission(false) != 0) {
+		if (_wire->endTransmission(false) != 0)
+		{
 			return -1;
 		}
 
-		if (_wire->requestFrom(_slaveAddress, length) != length) {
+		if (_wire->requestFrom(_slaveAddress, length) != length)
+		{
 			return 0;
 		}
 
-		for (size_t i = 0; i < length; i++) {
+		for (size_t i = 0; i < length; i++)
+		{
 			*data++ = _wire->read();
 		}
 	}
@@ -207,7 +231,8 @@ int KX0231025Class::readRegisters(uint8_t address, uint8_t* data, size_t length)
 
 int KX0231025Class::writeRegister(uint8_t address, uint8_t value)
 {
-	if (_spi != NULL) {
+	if (_spi != NULL)
+	{
 		_spi->beginTransaction(_spiSettings);
 		digitalWrite(_csPin, LOW);
 		_spi->transfer(address);
@@ -215,16 +240,15 @@ int KX0231025Class::writeRegister(uint8_t address, uint8_t value)
 		digitalWrite(_csPin, HIGH);
 		_spi->endTransaction();
 	}
-	else {
+	else
+	{
 		_wire->beginTransmission(_slaveAddress);
 		_wire->write(address);
 		_wire->write(value);
-		if (_wire->endTransmission() != 0) {
+		if (_wire->endTransmission() != 0)
+		{
 			return 0;
 		}
 	}
 	return 1;
 }
-
-
-
