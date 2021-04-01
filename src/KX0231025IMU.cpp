@@ -149,6 +149,38 @@ int KX0231025Class::getSda(){
 int KX0231025Class::getScl(){
 	return _scl;
 }
+int KX0231025Class::readRawData(int16_t &x, int16_t &y, int16_t &z){
+	int16_t data[3];
+
+	if (!readRegisters(KX0231025_OUTX_L_XL, (uint8_t *)data, sizeof(data)))
+	{
+		x = 0;
+		y = 0;
+		z = 0;
+
+		return 0;
+	}
+	if (this->_accelerationRange == KX0231025_RANGE_2G)
+	{
+		x = data[0] * 2;
+		y = data[1] * 2;
+		z = data[2] * 2;
+	}
+	if (this->_accelerationRange == KX0231025_RANGE_4G)
+	{
+		x = data[0] * 4;
+		y = data[1] * 4;
+		z = data[2] * 4;
+	}
+	if (this->_accelerationRange == KX0231025_RANGE_8G)
+	{
+		x = data[0] * 8;
+		y = data[1] * 8;
+		z = data[2] * 8;
+	}
+
+	return 1;
+}
 int KX0231025Class::readAcceleration(float &x, float &y, float &z)
 {
 	int16_t data[3];
