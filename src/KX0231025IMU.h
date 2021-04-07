@@ -21,10 +21,30 @@
 #include <Wire.h>
 #include <SPI.h>
 
+#define KX0231025_RANGE_2G 0
+#define KX0231025_RANGE_4G 1
+#define KX0231025_RANGE_8G 2
+
+#define KX0231025_DATARATE_12_5HZ 0
+#define KX0231025_DATARATE_25HZ 1
+#define KX0231025_DATARATE_50HZ 2
+#define KX0231025_DATARATE_100HZ 3
+#define KX0231025_DATARATE_200HZ 4
+#define KX0231025_DATARATE_400HZ 5
+#define KX0231025_DATARATE_800HZ 6
+#define KX0231025_DATARATE_1600HZ 7
+#define KX0231025_DATARATE_0_781HZ 8
+#define KX0231025_DATARATE_1_563HZ 9
+#define KX0231025_DATARATE_3_125HZ 10
+#define KX0231025_DATARATE_6_25HZ 11
+
+#define KX0231025_LOWPOWER_MODE 0X00
+#define KX0231025_HIGHPOWER_MODE 0X40
 
 class KX0231025Class {
 public:
 	KX0231025Class(TwoWire& wire, uint8_t slaveAddress);
+	KX0231025Class(TwoWire& wire, uint8_t slaveAddress, int sda, int scl);
 	KX0231025Class(SPIClass& spi, int csPin);
 	virtual ~KX0231025Class();
 
@@ -33,7 +53,9 @@ public:
 
 	// Accelerometer
 	virtual int readAcceleration(float& x, float& y, float& z); // Results are in G (earth gravity).
-
+	virtual int readRawData(int16_t& x, int16_t& y, int16_t& z); // Results are in Raw Integer format.
+	int getSda();
+	int getScl();
 private:
 	int readRegister(uint8_t address);
 	int readRegisters(uint8_t address, uint8_t* data, size_t length);
@@ -45,6 +67,8 @@ private:
 	uint8_t _slaveAddress;
 	int _csPin;
 	int _accelerationRange;
+	int _sda;
+	int _scl;
 
 	SPISettings _spiSettings;
 };
